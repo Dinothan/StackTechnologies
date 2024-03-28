@@ -5,7 +5,7 @@ import Button from '../components/Button';
 import AlertComponent from '../components/Alert';
 import Layout from '../components/Layout';
 
-const WelcomeScreen: FC = () => {
+const WelcomeScreen: FC = ({navigation}: any) => {
   const [isAlertVisible, setIsAlertVisible] = useState<boolean>(false);
 
   const showAlert = () => {
@@ -13,6 +13,7 @@ const WelcomeScreen: FC = () => {
   };
 
   const hideAlert = () => {
+    navigation.navigate('Login');
     setIsAlertVisible(false);
   };
 
