@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import {Button, Paragraph, Dialog, Portal} from 'react-native-paper';
 
 interface AlertProps {
@@ -6,6 +6,11 @@ interface AlertProps {
   hideAlert: () => void;
   title: string;
   description: string;
+  actionButtons: {
+    text: string;
+    style?: 'default' | 'cancel' | 'destructive';
+    onPress: () => void;
+  }[];
 }
 
 const AlertComponent: React.FC<AlertProps> = ({
@@ -13,22 +18,30 @@ const AlertComponent: React.FC<AlertProps> = ({
   hideAlert,
   title,
   description,
+  actionButtons,
 }) => {
-  const AlertDialog = useMemo(() => {
-    return (
+  const renderActionButtons = () => {
+    return actionButtons.map((button, index) => (
+      <Button
+        key={index}
+        onPress={button.onPress}
+        textColor={button.style === 'destructive' ? 'red' : undefined}>
+        {button.text}
+      </Button>
+    ));
+  };
+
+  return (
+    <Portal>
       <Dialog visible={visible} onDismiss={hideAlert}>
         <Dialog.Title>{title}</Dialog.Title>
         <Dialog.Content>
           <Paragraph>{description}</Paragraph>
         </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={hideAlert}>OK</Button>
-        </Dialog.Actions>
+        <Dialog.Actions>{renderActionButtons()}</Dialog.Actions>
       </Dialog>
-    );
-  }, [visible, hideAlert, title, description]);
-
-  return <Portal>{AlertDialog}</Portal>;
+    </Portal>
+  );
 };
 
 export default AlertComponent;

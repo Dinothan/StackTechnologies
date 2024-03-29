@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {getProducts} from '../thunk/productThunk';
 import {ErrorMessage} from '../../types/error';
 import {Product} from '../../types/product';
@@ -24,6 +24,11 @@ const productsSlice = createSlice({
     getSelectedProduct: (state, action) => {
       state.selectedItem = action.payload;
     },
+    deleteProduct: (state, action: PayloadAction<number>) => {
+      state.products = state.products.filter(
+        product => product.skuid !== action.payload,
+      );
+    },
   },
   extraReducers: builder => {
     builder.addCase(getProducts.pending, state => {
@@ -45,6 +50,6 @@ const productsSlice = createSlice({
   },
 });
 
-export const {getSelectedProduct} = productsSlice.actions;
+export const {getSelectedProduct, deleteProduct} = productsSlice.actions;
 
 export default productsSlice.reducer;
