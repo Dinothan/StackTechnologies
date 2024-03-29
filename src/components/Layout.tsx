@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 25,
+    padding: 15,
     alignItems: 'center',
   },
 });

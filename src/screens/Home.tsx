@@ -1,21 +1,51 @@
-import React, {FC} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import Header from '../components/Header';
+import React, {FC, useCallback, useEffect} from 'react';
+import {ScrollView, StyleSheet} from 'react-native';
 import Layout from '../components/Layout';
-import {useAppSelector} from '../hooks/hooks';
+import {useAppDispatch, useAppSelector} from '../hooks/hooks';
+import {getProducts} from '../store/thunk/productThunk';
+import Spinner from '../components/Spinner';
+import CardComponent from '../components/Card';
+import {Product} from '../types/product';
+import {getSelectedProduct} from '../store/slices/productSlice';
 
-const HomeScreen: FC = () => {
-  const username = useAppSelector(state => state.auth.username);
+const HomeScreen: FC = ({navigation}: any) => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getProducts());
+  }, []);
+
+  const {products, isLoading} = useAppSelector(state => state.products);
+
+  const getSelectProduct = useCallback(
+    (id: number) => {
+      const selectedProduct = products.find(res => res.skuid === id);
+      dispatch(getSelectedProduct(selectedProduct));
+      navigation.navigate('ViewProduct');
+    },
+    [dispatch, navigation, products],
+  );
 
   return (
-    <Layout>
-      <View style={styles.container}>
-        <View style={styles.textContainer}>
-          <Text style={styles.textStyle}>Hi {username} Welcome to </Text>
-          <Header>Stack Technologies</Header>
-        </View>
-      </View>
-    </Layout>
+    <ScrollView>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <Layout>
+          {products?.length > 0 &&
+            products.map((res: Product) => (
+              <CardComponent
+                key={res.skuid}
+                id={res.skuid}
+                title={res.skuname_enGB}
+                content={res.skushortdescription_enGB}
+                imageUrl={res.skuimageurl}
+                getSelectProduct={getSelectProduct}
+              />
+            ))}
+        </Layout>
+      )}
+    </ScrollView>
   );
 };
 
