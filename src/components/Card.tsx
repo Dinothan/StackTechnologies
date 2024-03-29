@@ -29,20 +29,22 @@ const CardComponent: FC<CardProps> = ({
     getSelectProduct(id);
   }, [getSelectProduct, id]);
 
-  const onPressDelete = (id: number) => {
+  const onPressDelete = useCallback((id: number) => {
     setIsAlertVisible(true);
     setItemIdToDelete(id);
-  };
+  }, []);
 
-  const handleAlertDismiss = () => {
+  const handleAlertDismiss = useCallback(() => {
     setIsAlertVisible(false);
     setItemIdToDelete(null);
-  };
+  }, []);
 
-  const handleDeleteItem = () => {
-    dispatch(deleteProduct(itemIdToDelete as number));
-    handleAlertDismiss();
-  };
+  const handleDeleteItem = useCallback(() => {
+    if (itemIdToDelete !== null) {
+      dispatch(deleteProduct(itemIdToDelete));
+      handleAlertDismiss();
+    }
+  }, [dispatch, itemIdToDelete, handleAlertDismiss]);
 
   return (
     <Card style={styles.container} onPress={onPressItem}>
