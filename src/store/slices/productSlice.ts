@@ -29,6 +29,20 @@ const productsSlice = createSlice({
         product => product.skuid !== action.payload,
       );
     },
+    updateProduct: (state, action: PayloadAction<Product>) => {
+      state.products = state.products.map(product =>
+        product.skuid === action.payload.skuid ? action.payload : product,
+      );
+    },
+    updateSelectedProduct(
+      state,
+      action: PayloadAction<{fieldName: keyof Product; value: any}>,
+    ) {
+      if (state.selectedItem) {
+        const {fieldName, value} = action.payload;
+        state.selectedItem[fieldName] = value as never;
+      }
+    },
   },
   extraReducers: builder => {
     builder.addCase(getProducts.pending, state => {
@@ -50,6 +64,11 @@ const productsSlice = createSlice({
   },
 });
 
-export const {getSelectedProduct, deleteProduct} = productsSlice.actions;
+export const {
+  getSelectedProduct,
+  deleteProduct,
+  updateSelectedProduct,
+  updateProduct,
+} = productsSlice.actions;
 
 export default productsSlice.reducer;

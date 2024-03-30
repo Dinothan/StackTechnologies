@@ -21,7 +21,7 @@ const HomeScreen: FC = ({navigation}: any) => {
     (id: number) => {
       const selectedProduct = products.find(res => res.skuid === id);
       dispatch(getSelectedProduct(selectedProduct));
-      navigation.navigate('ViewProduct');
+      navigation.navigate('ViewProduct', {isEdit: false});
     },
     [dispatch, navigation, products],
   );
@@ -41,6 +41,7 @@ const HomeScreen: FC = ({navigation}: any) => {
                 content={res.skushortdescription_enGB}
                 imageUrl={res.skuimageurl}
                 getSelectProduct={getSelectProduct}
+                navigation={navigation}
               />
             ))}
         </Layout>

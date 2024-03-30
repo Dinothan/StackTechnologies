@@ -2,8 +2,8 @@ import React, {FC, useCallback, useState} from 'react';
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {Card, Text} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {deleteProduct} from '../store/slices/productSlice';
-import {useAppDispatch} from '../hooks/hooks';
+import {deleteProduct, getSelectedProduct} from '../store/slices/productSlice';
+import {useAppDispatch, useAppSelector} from '../hooks/hooks';
 import AlertComponent from './Alert';
 
 interface CardProps {
@@ -12,6 +12,7 @@ interface CardProps {
   imageUrl: string;
   id: number;
   getSelectProduct: (id: number) => void;
+  navigation: any;
 }
 
 const CardComponent: FC<CardProps> = ({
@@ -19,11 +20,13 @@ const CardComponent: FC<CardProps> = ({
   content,
   imageUrl,
   id,
+  navigation,
   getSelectProduct,
 }: CardProps) => {
   const [isAlertVisible, setIsAlertVisible] = useState<boolean>(false);
   const [itemIdToDelete, setItemIdToDelete] = useState<number | null>(null);
   const dispatch = useAppDispatch();
+  const {products} = useAppSelector(state => state.products);
 
   const onPressItem = useCallback(() => {
     getSelectProduct(id);
@@ -46,6 +49,13 @@ const CardComponent: FC<CardProps> = ({
     }
   }, [dispatch, itemIdToDelete, handleAlertDismiss]);
 
+  const onPressEdit = (id: number) => {
+    const selectedProduct = products.find(res => res.skuid === id);
+    dispatch(getSelectedProduct(selectedProduct));
+
+    navigation.navigate('ViewProduct', {isEdit: true});
+  };
+
   return (
     <Card style={styles.container} onPress={onPressItem}>
       <Card.Content>
@@ -56,23 +66,25 @@ const CardComponent: FC<CardProps> = ({
       </Card.Content>
       <Card.Cover source={{uri: imageUrl}} style={styles.imageStyle} />
       <View style={styles.actionContainer}>
-        <View style={styles.actionButton}>
+        <TouchableOpacity
+          onPress={() => onPressEdit(id)}
+          style={styles.actionButton}>
           <Text style={styles.editText}>Edit</Text>
           <MaterialCommunityIcons
             name="circle-edit-outline"
             size={20}
             color={'blue'}
           />
-        </View>
-        <TouchableOpacity onPress={() => onPressDelete(id)}>
-          <View style={styles.actionButton}>
-            <Text style={styles.deleteText}>Delete</Text>
-            <MaterialCommunityIcons
-              name="delete-outline"
-              color={'red'}
-              size={20}
-            />
-          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => onPressDelete(id)}
+          style={styles.actionButton}>
+          <Text style={styles.deleteText}>Delete</Text>
+          <MaterialCommunityIcons
+            name="delete-outline"
+            color={'red'}
+            size={20}
+          />
         </TouchableOpacity>
       </View>
       <AlertComponent

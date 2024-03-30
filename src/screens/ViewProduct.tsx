@@ -1,20 +1,74 @@
-import React, {FC} from 'react';
+import React, {FC, useCallback, useEffect, useState} from 'react';
 import Background from '../components/Layout';
-import {useAppSelector} from '../hooks/hooks';
-import {Text, View, Image, ScrollView, StyleSheet} from 'react-native';
+import {useAppDispatch, useAppSelector} from '../hooks/hooks';
+import {
+  Text,
+  View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import RowItem from '../components/RowItem';
+import Button from '../components/Button';
+import {
+  updateProduct,
+  updateSelectedProduct,
+} from '../store/slices/productSlice';
+import {launchImageLibrary} from 'react-native-image-picker';
 
-const ViewProductScreen: FC = () => {
+const ViewProductScreen: FC = ({route, navigation}: any) => {
+  const dispatch = useAppDispatch();
   const selectedItem = useAppSelector(state => state.products.selectedItem);
+  const [newImage, setNewImage] = useState<string | undefined>(undefined);
+  const {isEdit} = route.params;
+
+  const onPressUpdate = () => {
+    if (selectedItem) {
+      dispatch(updateProduct(selectedItem));
+      navigation.navigate('Home');
+    }
+  };
+
+  const selectImage = useCallback(() => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
+      if (
+        !response.didCancel &&
+        response.assets &&
+        response.assets.length > 0
+      ) {
+        const selectedImage = response.assets[0].uri;
+        setNewImage(selectedImage);
+        dispatch(
+          updateSelectedProduct({
+            fieldName: 'skuimageurl',
+            value: selectedImage,
+          }),
+        );
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    // Set the initial image URL if available
+    if (selectedItem && selectedItem.skuimageurl) {
+      setNewImage(selectedItem.skuimageurl);
+    }
+  }, [selectedItem]);
 
   return (
     <ScrollView>
       <Background>
-        <Image
-          source={{uri: selectedItem?.skuimageurl}}
-          style={styles.image}
-          resizeMode="stretch"
-        />
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.imageContainer}
+          onPress={isEdit ? selectImage : undefined}>
+          <Image
+            source={{uri: newImage}}
+            style={styles.image}
+            resizeMode="stretch"
+          />
+        </TouchableOpacity>
 
         <View style={styles.contentContainer}>
           <Text style={styles.productName}>{selectedItem?.skuname_enGB}</Text>
@@ -24,26 +78,53 @@ const ViewProductScreen: FC = () => {
 
           {selectedItem && (
             <View style={styles.infoContainer}>
-              <RowItem label="Price" value={selectedItem.skuprice} />
+              <RowItem
+                label="Price"
+                value={selectedItem.skuprice}
+                isEditable={isEdit}
+                fieldName="skuprice"
+              />
               <RowItem
                 label="Retail Price"
                 value={selectedItem.skuretailprice}
+                isEditable={isEdit}
+                fieldName="skuretailprice"
               />
-              <RowItem label="Code" value={selectedItem.skualtcode} />
+              <RowItem
+                label="Code"
+                value={selectedItem.skualtcode}
+                isEditable={isEdit}
+                fieldName="skualtcode"
+              />
               <RowItem
                 label="Available Items"
                 value={selectedItem.skuavailableitems}
+                isEditable={isEdit}
+                fieldName="skuavailableitems"
               />
-              <RowItem label="Weight" value={selectedItem.skuweight} />
+              <RowItem
+                label="Weight"
+                value={selectedItem.skuweight}
+                isEditable={isEdit}
+                fieldName="skuweight"
+              />
             </View>
           )}
         </View>
+        {isEdit && (
+          <View style={styles.saveBtn}>
+            <Button mode="contained" onPress={onPressUpdate}>
+              Save
+            </Button>
+          </View>
+        )}
       </Background>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  imageContainer: {flexDirection: 'row'},
   image: {
     width: '100%',
     height: 250,
@@ -62,6 +143,11 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     paddingBottom: 10,
+  },
+  saveBtn: {
+    width: '100%',
+    alignItems: 'center',
+    paddingBottom: 5,
   },
 });
 
