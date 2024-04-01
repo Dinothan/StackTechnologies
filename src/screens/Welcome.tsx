@@ -30,10 +30,16 @@ const WelcomeScreen: FC = ({navigation}: any) => {
         </Button>
 
         <AlertComponent
-          title="Stack Technologies"
-          description={"Please click 'Ok' to Login"}
           visible={isAlertVisible}
           hideAlert={hideAlert}
+          title="Stack Technologies"
+          description="Please click 'Ok' to Login"
+          actionButtons={[
+            {
+              text: 'Ok',
+              onPress: hideAlert,
+            },
+          ]}
         />
       </View>
     </Layout>
