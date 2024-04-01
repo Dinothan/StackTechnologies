@@ -10,7 +10,7 @@ interface ProductSliceProps {
   selectedItem: Product | null;
 }
 
-const initialState: ProductSliceProps = {
+export const initialState: ProductSliceProps = {
   products: [],
   error: {message: ''},
   isLoading: false,

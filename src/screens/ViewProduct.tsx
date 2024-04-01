@@ -62,11 +62,13 @@ const ViewProductScreen: FC = ({route, navigation}: any) => {
         <TouchableOpacity
           activeOpacity={0.7}
           style={styles.imageContainer}
-          onPress={isEdit ? selectImage : undefined}>
+          onPress={isEdit ? selectImage : undefined}
+          testID="imageContainer">
           <Image
             source={{uri: newImage}}
             style={styles.image}
             resizeMode="stretch"
+            testID="productImage"
           />
         </TouchableOpacity>
 
@@ -113,7 +115,10 @@ const ViewProductScreen: FC = ({route, navigation}: any) => {
         </View>
         {isEdit && (
           <View style={styles.saveBtn}>
-            <Button mode="contained" onPress={onPressUpdate}>
+            <Button
+              mode="contained"
+              onPress={onPressUpdate}
+              testID="saveButton">
               Save
             </Button>
           </View>
