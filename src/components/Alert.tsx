@@ -33,7 +33,7 @@ const AlertComponent: React.FC<AlertProps> = ({
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={hideAlert}>
+      <Dialog visible={visible} onDismiss={hideAlert} testID="dialog-dismiss">
         <Dialog.Title>{title}</Dialog.Title>
         <Dialog.Content>
           <Paragraph>{description}</Paragraph>
